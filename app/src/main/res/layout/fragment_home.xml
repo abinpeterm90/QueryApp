@@ -1,0 +1,43 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.teksine.queryapplication.fragment.HomeFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:text="submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+
+            android:id="@+id/submit_query"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="15dp" />
+
+        <TextView
+            android:text="Hi User"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textAlignment="center"
+            android:textSize="24dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/welcomeText"
+            android:layout_alignParentTop="true"
+            android:layout_alignStart="@+id/submit_query" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_height="350dp"
+            android:layout_below="@+id/welcomeText"
+            android:inputType="textMultiLine"
+            android:ems="10"
+            android:id="@+id/query_text" />
+    </RelativeLayout>
+
+</FrameLayout>
