@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
+import com.teksine.queryapplication.model.EndUser;
 import com.teksine.queryapplication.model.User;
 
 /**
@@ -46,6 +47,20 @@ public class SharedPreferencesManager {
         Gson gson = new Gson();
         String tempValue = gson.toJson(user);
         editor.putString("user" , tempValue);
+        editor.commit();
+    }
+    public EndUser getEndUserInformation(Context context,String value) {
+        Gson gson = new Gson();
+        String json = getSharedPreferences(context).getString(value,"");
+        EndUser obj = gson.fromJson(json, EndUser.class);
+        return  obj;
+    }
+    //
+    public  void setEndUserInformation(Context context, EndUser user) {
+        final SharedPreferences.Editor editor = getSharedPreferences(context).edit();
+        Gson gson = new Gson();
+        String tempValue = gson.toJson(user);
+        editor.putString("endUser" , tempValue);
         editor.commit();
     }
 

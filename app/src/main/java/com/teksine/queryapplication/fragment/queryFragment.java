@@ -1,20 +1,18 @@
 package com.teksine.queryapplication.fragment;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.teksine.queryapplication.R;
@@ -26,12 +24,12 @@ import com.teksine.queryapplication.utils.SharedPreferencesManager;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link HomeFragment.OnFragmentInteractionListener} interface
+ * {@link queryFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link HomeFragment#newInstance} factory method to
+ * Use the {@link queryFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment {
+public class queryFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -40,10 +38,13 @@ public class HomeFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    DatabaseReference mDatabase;
+    //private DatabaseReference mDatabase=FirebaseDatabase.getInstance().getReference();
+    SharedPreferencesManager msharedManger=SharedPreferencesManager.getSharedPreferanceManager();
 
     private OnFragmentInteractionListener mListener;
 
-    public HomeFragment() {
+    public queryFragment() {
         // Required empty public constructor
     }
 
@@ -53,11 +54,11 @@ public class HomeFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
+     * @return A new instance of fragment queryFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
+    public static queryFragment newInstance(String param1, String param2) {
+        queryFragment fragment = new queryFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -68,19 +69,34 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+        mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view=inflater.inflate(R.layout.fragment_home, container, false);
-        Button expertAdviceButton= (Button) view.findViewById(R.id.expertAdviceButton);
-        expertAdviceButton.setOnClickListener(new View.OnClickListener() {
+        View view=inflater.inflate(R.layout.fragment_query, container, false);
+        final EditText queryText= (EditText) view.findViewById(R.id.query_text);
+        Button submitButton=(Button)view.findViewById(R.id.submit_query);
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            User user = msharedManger.getUserInformation(getContext(),"user");
+
+
             @Override
             public void onClick(View view) {
-                Fragment fragment = new queryFragment();
+                EndUser endUser=new EndUser();
+                endUser.setQuery(queryText.getText().toString());
+                endUser.setEmail(user.getEmail());
+                endUser.setGoogleId(user.getGoogleId());
+                endUser.setAnswerStatus(0);
+                endUser.setFirstName(user.getFirstName());
+                msharedManger.setEndUserInformation(getContext(),endUser);
+                Fragment fragment = new ExpertListFragment();
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.frame, fragment);
@@ -88,6 +104,9 @@ public class HomeFragment extends Fragment {
                 fragmentTransaction.commit();
             }
         });
+
+
+
         return view;
     }
 

@@ -1,37 +1,41 @@
 package com.teksine.queryapplication.fragment;
 
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
 
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.teksine.queryapplication.R;
+import com.teksine.queryapplication.adapters.CustomBaseAdapter;
 import com.teksine.queryapplication.model.EndUser;
-import com.teksine.queryapplication.model.User;
+import com.teksine.queryapplication.other.RowItem;
 import com.teksine.queryapplication.utils.GeneralFunctions;
 import com.teksine.queryapplication.utils.SharedPreferencesManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link HomeFragment.OnFragmentInteractionListener} interface
+ * {@link ExpertListFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link HomeFragment#newInstance} factory method to
+ * Use the {@link ExpertListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment {
+public class ExpertListFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -40,10 +44,32 @@ public class HomeFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    ListView listView;
+    List<RowItem> rowItems;
+    DatabaseReference mDatabase;
+    private EndUser endUser;
+    SharedPreferencesManager msharedManger=SharedPreferencesManager.getSharedPreferanceManager();
+
+    public static final int[] ids =  {1,2,3,4};
+    public static final String[] titles = new String[] { "Abin Peter",
+            "Sebastian P J", "Justin John", "Anoop" };
+
+    public static final String[] descriptions = new String[] {
+            "Software engineer",
+            "Hardware Engineer", "Accountant",
+            "Technecian" };
+
+    public static final Integer[] images = { R.drawable.user,
+            R.drawable.user, R.drawable.user, R.drawable.user };
+
+    ProgressDialog nDialog;
+
+
+
 
     private OnFragmentInteractionListener mListener;
 
-    public HomeFragment() {
+    public ExpertListFragment() {
         // Required empty public constructor
     }
 
@@ -53,11 +79,11 @@ public class HomeFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
+     * @return A new instance of fragment ExpertListFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
+    public static ExpertListFragment newInstance(String param1, String param2) {
+        ExpertListFragment fragment = new ExpertListFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -68,27 +94,53 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        rowItems = new ArrayList<RowItem>();
+        for (int i = 0; i < titles.length; i++) {
+            RowItem item = new RowItem(ids[i],images[i], titles[i], descriptions[i]);
+            rowItems.add(item);
+        }
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        endUser=msharedManger.getEndUserInformation(getContext(),"endUser");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view=inflater.inflate(R.layout.fragment_home, container, false);
-        Button expertAdviceButton= (Button) view.findViewById(R.id.expertAdviceButton);
-        expertAdviceButton.setOnClickListener(new View.OnClickListener() {
+        View rootView=inflater.inflate(R.layout.fragment_expert_list, container, false);
+
+        listView = (ListView)rootView.findViewById(R.id.list);
+        CustomBaseAdapter adapter = new CustomBaseAdapter(getContext(), rowItems);
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
             @Override
-            public void onClick(View view) {
-                Fragment fragment = new queryFragment();
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+//                Toast toast = Toast.makeText(getContext(),
+//                        "Item " + (position + 1) + ": " + rowItems.get(position).,
+//                        Toast.LENGTH_SHORT);
+//                toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
+//                toast.show();
+                nDialog = new ProgressDialog(getContext());
+                nDialog.setMessage("Updating data..");
+                nDialog.setTitle("Query");
+                nDialog.setIndeterminate(false);
+                nDialog.setCancelable(true);
+                nDialog.show();
+
+                String expertId= String.valueOf(rowItems.get(position).getId());
+                mDatabase.child(expertId).child("query").child(endUser.getGoogleId()).push().setValue(endUser);
+                nDialog.hide();
+                Fragment fragment = new successFragment();
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.frame, fragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
+
             }
         });
-        return view;
+        return rootView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
