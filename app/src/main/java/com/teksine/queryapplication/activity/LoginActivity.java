@@ -7,6 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -24,13 +27,17 @@ public class LoginActivity extends AppCompatActivity {
     GoogleSignInClient mGoogleSignInClient;
     SharedPreferencesManager msharedManger=SharedPreferencesManager.getSharedPreferanceManager();
      Context mContext;
+    RadioGroup role;
+
     private static final int RC_SIGN_IN = 9001;
     private static final String loggerTag = "Login Activity::";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
+        role=(RadioGroup)findViewById(R.id.radioGroup) ;
         mContext=getApplicationContext();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -81,9 +88,17 @@ public class LoginActivity extends AppCompatActivity {
             User user=validateAndSaveUserInfo(account);
             msharedManger.setUserInformation(mContext,user);
             Toast.makeText(getApplicationContext(), "successful" + account.getEmail(), Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra("googleId", account.getEmail());
-            startActivity(intent);
+            int selectedID= role.getCheckedRadioButtonId();
+            RadioButton role=(RadioButton)findViewById(selectedID);
+            if(role.getText().equals("User")) {
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("googleId", account.getEmail());
+                startActivity(intent);
+            }
+            else if(role.getText().equals("Expert")){
+                Intent intent = new Intent(this, ExpertMainActivity.class);
+                startActivity(intent);
+            }
 
             // Signed in successfully, show authenticated UI.
             //updateUI(account);
@@ -101,19 +116,15 @@ public class LoginActivity extends AppCompatActivity {
             user.setEmail(account.getEmail());
         }
         if (account.getGivenName() != null) {
-
             user.setFirstName(account.getGivenName());
         }
         if (account.getFamilyName() != null) {
-
             user.setLastName(account.getFamilyName());
         }
         if (account.getPhotoUrl() != null) {
-
             user.setPhotUrl(account.getPhotoUrl().toString());
         }
         if (account.getId() != null) {
-
             user.setGoogleId(account.getId());
         }
         return user;

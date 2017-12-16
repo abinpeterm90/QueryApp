@@ -76,7 +76,7 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_home, container, false);
-        Button expertAdviceButton= (Button) view.findViewById(R.id.expertAdviceButton);
+        TextView expertAdviceButton= (TextView) view.findViewById(R.id.expertAdviceText);
         expertAdviceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -17,7 +17,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,22 +25,15 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.teksine.queryapplication.R;
 import com.teksine.queryapplication.fragment.HomeFragment;
-import com.teksine.queryapplication.fragment.MoviesFragment;
-import com.teksine.queryapplication.fragment.NotificationsFragment;
 import com.teksine.queryapplication.fragment.PhotosFragment;
-import com.teksine.queryapplication.fragment.SettingsFragment;
 import com.teksine.queryapplication.model.User;
 import com.teksine.queryapplication.other.CircleTransform;
 import com.teksine.queryapplication.utils.SharedPreferencesManager;
 
-import static java.security.AccessController.getContext;
 
-
-public class MainActivity extends AppCompatActivity {
-
+public class ExpertMainActivity extends AppCompatActivity {
     private NavigationView navigationView;
     private DrawerLayout drawer;
     private View navHeader;
@@ -80,13 +72,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_expert_main);
         FirebaseApp.initializeApp(getApplicationContext());
         //Firebase myFirebaseRef = new Firebase("https://carbar-7dae7.firebaseio.com/");
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+       // toolbar = (Toolbar) findViewById(R.id.toolbarExpert);
+       // setSupportActionBar(toolbar);
         mContext=getApplicationContext();
         mHandler = new Handler();
 
@@ -132,26 +123,6 @@ public class MainActivity extends AppCompatActivity {
      */
     private void loadNavHeader() {
         // name, website
-        User user=msharedManger.getUserInformation(mContext,"user");
-        if(user.getFirstName()!=null && user.getLastName()!=null)
-        txtName.setText(user.getFirstName()+" "+user.getLastName());
-        if(user.getEmail()!=null)
-        txtWebsite.setText(user.getEmail());
-
-        // loading header background image
-        Glide.with(this).load(urlNavHeaderBg)
-                .crossFade()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(imgNavHeaderBg);
-
-        // Loading profile image
-        if(user.getPhotUrl()!=null)
-        Glide.with(this).load(user.getPhotUrl())
-                .crossFade()
-                .thumbnail(0.5f)
-                .bitmapTransform(new CircleTransform(this))
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into(imgProfile);
 
         // showing dot next to notifications label
         navigationView.getMenu().getItem(3).setActionView(R.layout.menu_dot);
@@ -220,26 +191,13 @@ public class MainActivity extends AppCompatActivity {
                 // photos
                 PhotosFragment photosFragment = new PhotosFragment();
                 return photosFragment;
-            case 2:
-                // movies fragment
-                MoviesFragment moviesFragment = new MoviesFragment();
-                return moviesFragment;
-            case 3:
-                // notifications fragment
-                NotificationsFragment notificationsFragment = new NotificationsFragment();
-                return notificationsFragment;
-
-            case 4:
-                // settings fragment
-                SettingsFragment settingsFragment = new SettingsFragment();
-                return settingsFragment;
             default:
                 return new HomeFragment();
         }
     }
 
     private void setToolbarTitle() {
-        getSupportActionBar().setTitle(activityTitles[navItemIndex]);
+        //getSupportActionBar().setTitle(activityTitles[navItemIndex]);
     }
 
     private void selectNavMenu() {
@@ -265,28 +223,6 @@ public class MainActivity extends AppCompatActivity {
                         navItemIndex = 1;
                         CURRENT_TAG = TAG_PHOTOS;
                         break;
-                    case R.id.nav_movies:
-                        navItemIndex = 2;
-                        CURRENT_TAG = TAG_MOVIES;
-                        break;
-                    case R.id.nav_notifications:
-                        navItemIndex = 3;
-                        CURRENT_TAG = TAG_NOTIFICATIONS;
-                        break;
-                    case R.id.nav_settings:
-                        navItemIndex = 4;
-                        CURRENT_TAG = TAG_SETTINGS;
-                        break;
-                    case R.id.nav_about_us:
-                        // launch new intent instead of loading fragment
-                        startActivity(new Intent(MainActivity.this, AboutUsActivity.class));
-                        drawer.closeDrawers();
-                        return true;
-                    case R.id.nav_privacy_policy:
-                        // launch new intent instead of loading fragment
-                        startActivity(new Intent(MainActivity.this, PrivacyPolicyActivity.class));
-                        drawer.closeDrawers();
-                        return true;
                     default:
                         navItemIndex = 0;
                 }
