@@ -63,5 +63,20 @@ public class SharedPreferencesManager {
         editor.putString("endUser" , tempValue);
         editor.commit();
     }
-
+public void setGoogleId(Context context,String googleId){
+    final SharedPreferences.Editor editor = getSharedPreferences(context).edit();
+    editor.putString("googleId",googleId);
+    editor.commit();
+}
+public String getGoogleId(Context context){
+    return getSharedPreferences(context).getString("googleId","");
+}
+public void setQueryId(Context context,String queryId){
+    final SharedPreferences.Editor editor = getSharedPreferences(context).edit();
+    editor.putString("queryId",queryId);
+    editor.commit();
+}
+    public String getQueryId(Context context){
+        return getSharedPreferences(context).getString("queryId","");
+    }
 }

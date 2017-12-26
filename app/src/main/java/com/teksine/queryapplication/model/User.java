@@ -71,4 +71,25 @@ public class User {
 
     private String email;
     private Integer phoneNumber;
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+    String topic;
+
+
+    public Integer getAnswerStatus() {
+        return answerStatus;
+    }
+
+    public void setAnswerStatus(Integer answerStatus) {
+        this.answerStatus = answerStatus;
+    }
+
+    private Integer answerStatus;
 }

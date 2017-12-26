@@ -2,7 +2,6 @@ package com.teksine.queryapplication.fragment;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -10,67 +9,58 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.teksine.queryapplication.R;
-import com.teksine.queryapplication.adapters.QueryHistoryAdapter;
+import com.teksine.queryapplication.adapters.CustomBaseAdapter;
 import com.teksine.queryapplication.adapters.QueryListAdapter;
-import com.teksine.queryapplication.model.EndUser;
-import com.teksine.queryapplication.model.User;
 import com.teksine.queryapplication.other.Notification;
-import com.teksine.queryapplication.utils.GeneralFunctions;
+import com.teksine.queryapplication.other.RowItem;
 import com.teksine.queryapplication.utils.SharedPreferencesManager;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link HomeFragment.OnFragmentInteractionListener} interface
+ * {@link ExpertHomeFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link HomeFragment#newInstance} factory method to
+ * Use the {@link ExpertHomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment {
+public class ExpertHomeFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    List<Notification> rowItems;
+    ProgressDialog progressDialog;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private  DatabaseReference queryRoot;
-    private User user;
-    private String googleId;
-    private TextView textView;
-    QueryHistoryAdapter adapter;
-    StringBuilder userName;
-    List<EndUser> rowItems;
     private DatabaseReference mDatabaseReferance = FirebaseDatabase.getInstance().getReference().getRoot();
-    SharedPreferencesManager msharedManger=SharedPreferencesManager.getSharedPreferanceManager();
-    ProgressDialog progressDialog;
-
-
+    DatabaseReference notificationRoot = mDatabaseReferance.child("1").child("notification");
 
     private OnFragmentInteractionListener mListener;
+    QueryListAdapter adapter;
 
-    public HomeFragment() {
+    public ExpertHomeFragment() {
         // Required empty public constructor
     }
 
@@ -80,11 +70,11 @@ public class HomeFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
+     * @return A new instance of fragment ExpertHomeFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
+    public static ExpertHomeFragment newInstance(String param1, String param2) {
+        ExpertHomeFragment fragment = new ExpertHomeFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -95,33 +85,28 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        rowItems = new ArrayList<Notification>();
 
-        rowItems = new ArrayList<EndUser>();
-        user=msharedManger.getUserInformation(getContext(),"user");
-        googleId=user.getGoogleId();
-        userName=new StringBuilder();
-        userName.append("Hi !").append(" ").append(user.getFirstName()).append(" ").append(user.getLastName());
-        queryRoot = mDatabaseReferance.child("1").child("query").child(googleId);
-        progressDialog=createProgressDialog();
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view=inflater.inflate(R.layout.fragment_home, container, false);
-        textView=view.findViewById(R.id.userNameText);
-        textView.setText(userName.substring(0,1).toUpperCase() + userName.substring(1));
-        ListView listView=view.findViewById(R.id.previousList);
-        adapter = new QueryHistoryAdapter(getContext(), rowItems);
-        listView.setAdapter(adapter);
-        progressDialog.show();
 
-        TextView expertAdviceButton= (TextView) view.findViewById(R.id.expertAdviceText);
-        expertAdviceButton.setOnClickListener(new View.OnClickListener() {
+        View rootView=inflater.inflate(R.layout.fragment_expert_home, container, false);
+        adapter = new QueryListAdapter(getContext(), rowItems);
+        ListView listView = (ListView)rootView.findViewById(R.id.queryList);
+        listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View view) {
-                Fragment fragment = new queryFragment();
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Toast.makeText(getContext(),"clicked at "+position,Toast.LENGTH_SHORT).show();
+                SharedPreferencesManager.getSharedPreferanceManager().setGoogleId(getContext(),rowItems.get(position).getGoogleID());
+                SharedPreferencesManager.getSharedPreferanceManager().setQueryId(getContext(),String.valueOf(position+1));
+                Fragment fragment = new AnswerFragment();
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.frame, fragment);
@@ -130,15 +115,20 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        queryRoot.addChildEventListener(new ChildEventListener() {
+
+
+
+
+
+        progressDialog=createProgressDialog();
+        progressDialog.show();
+        notificationRoot.addChildEventListener(new ChildEventListener() {
 
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-                updateUI(dataSnapshot);
-                adapter.notifyDataSetChanged();
+              updateUI(dataSnapshot);
+              adapter.notifyDataSetChanged();
                 progressDialog.dismiss();
-
 
             }
 
@@ -166,9 +156,9 @@ public class HomeFragment extends Fragment {
 
 
 
-
-        return view;
+             return rootView;
     }
+
     private ProgressDialog createProgressDialog() {
         final ProgressDialog pd = new ProgressDialog(getContext());
 
@@ -189,18 +179,27 @@ public class HomeFragment extends Fragment {
     }
 
     private void updateUI(DataSnapshot dataSnapshot) {
-        EndUser endUser=new EndUser();
-        Iterator i = dataSnapshot.getChildren().iterator();
-        while (i.hasNext()) {
-            endUser.setAnswer(((DataSnapshot) i.next()).getValue().toString());
-            endUser.setAnswerStatus((Long) ((DataSnapshot) i.next()).getValue());
-            endUser.setQuery(((DataSnapshot) i.next()).getValue().toString());
-            rowItems.add(endUser);
+
+        Iterator i=dataSnapshot.getChildren().iterator();
+        Notification notification=new Notification();
+        while(i.hasNext()){
+            notification.setAnswerStatus((Long) ((DataSnapshot)i.next()).getValue());
+            notification.setEmail(((DataSnapshot)i.next()).getValue().toString());
+            notification.setFirstName(((DataSnapshot)i.next()).getValue().toString());
+            notification.setGoogleID(((DataSnapshot)i.next()).getValue().toString());
+            notification.setLastName(((DataSnapshot)i.next()).getValue().toString());
+            notification.setPhotoUrl(((DataSnapshot)i.next()).getValue().toString());
+            notification.setTopic((((DataSnapshot)i.next()).getValue().toString()));
+            rowItems.add(notification);
+
             //Log.d("++++++++++", String.valueOf(temp.add(((DataSnapshot)i.next()).getKey().toString())));
         }
+
+
     }
 
-        // TODO: Rename method, update argument and hook method into UI event
+
+    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -210,12 +209,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
+
     }
 
     @Override

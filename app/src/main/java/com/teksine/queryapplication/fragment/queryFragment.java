@@ -82,6 +82,7 @@ public class queryFragment extends Fragment {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_query, container, false);
         final EditText queryText= (EditText) view.findViewById(R.id.query_text);
+        final EditText queryTopic=(EditText)view.findViewById(R.id.topicText);
         Button submitButton=(Button)view.findViewById(R.id.submit_query);
         submitButton.setOnClickListener(new View.OnClickListener() {
             User user = msharedManger.getUserInformation(getContext(),"user");
@@ -91,11 +92,11 @@ public class queryFragment extends Fragment {
             public void onClick(View view) {
                 EndUser endUser=new EndUser();
                 endUser.setQuery(queryText.getText().toString());
-                endUser.setEmail(user.getEmail());
-                endUser.setGoogleId(user.getGoogleId());
-                endUser.setAnswerStatus(0);
-                endUser.setFirstName(user.getFirstName());
+                user.setTopic(queryTopic.getText().toString());
+                endUser.setAnswer("");
+                endUser.setAnswerStatus((long) 0);
                 msharedManger.setEndUserInformation(getContext(),endUser);
+                msharedManger.setUserInformation(getContext(),user);
                 Fragment fragment = new ExpertListFragment();
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

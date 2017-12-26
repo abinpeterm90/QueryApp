@@ -6,7 +6,7 @@ import java.util.Date;
  * Created by abin on 09/12/2017.
  */
 
-public class EndUser extends User {
+public class EndUser  {
 
     public Date getPostedDate() {
         return postedDate;
@@ -24,15 +24,28 @@ public class EndUser extends User {
         this.query = query;
     }
 
-    public Integer getAnswerStatus() {
+    private String query;
+
+    public String getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(String answer) {
+        this.answer = answer;
+    }
+
+    private String answer;
+
+    private Date postedDate;
+
+    public Long getAnswerStatus() {
         return answerStatus;
     }
 
-    public void setAnswerStatus(Integer answerStatus) {
+    public void setAnswerStatus(Long answerStatus) {
         this.answerStatus = answerStatus;
     }
 
-    private String query;
-    private Date postedDate;
-    private Integer answerStatus;
+    private Long answerStatus;
+
 }

@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,8 +27,12 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
 import com.teksine.queryapplication.R;
+import com.teksine.queryapplication.fragment.ExpertHomeFragment;
 import com.teksine.queryapplication.fragment.HomeFragment;
+import com.teksine.queryapplication.fragment.MoviesFragment;
+import com.teksine.queryapplication.fragment.NotificationsFragment;
 import com.teksine.queryapplication.fragment.PhotosFragment;
+import com.teksine.queryapplication.fragment.SettingsFragment;
 import com.teksine.queryapplication.model.User;
 import com.teksine.queryapplication.other.CircleTransform;
 import com.teksine.queryapplication.utils.SharedPreferencesManager;
@@ -68,16 +73,18 @@ public class ExpertMainActivity extends AppCompatActivity {
     private boolean shouldLoadHomeFragOnBackPress = true;
     private Handler mHandler;
 
-    private DatabaseReference mDatabase;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_expert_main);
         FirebaseApp.initializeApp(getApplicationContext());
         //Firebase myFirebaseRef = new Firebase("https://carbar-7dae7.firebaseio.com/");
 
-       // toolbar = (Toolbar) findViewById(R.id.toolbarExpert);
-       // setSupportActionBar(toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         mContext=getApplicationContext();
         mHandler = new Handler();
 
@@ -123,9 +130,29 @@ public class ExpertMainActivity extends AppCompatActivity {
      */
     private void loadNavHeader() {
         // name, website
+        User user=msharedManger.getUserInformation(mContext,"user");
+        if(user.getFirstName()!=null && user.getLastName()!=null)
+            txtName.setText(user.getFirstName()+" "+user.getLastName());
+        if(user.getEmail()!=null)
+            txtWebsite.setText(user.getEmail());
+
+        // loading header background image
+        Glide.with(this).load(urlNavHeaderBg)
+                .crossFade()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(imgNavHeaderBg);
+
+        // Loading profile image
+        if(user.getPhotUrl()!=null)
+            Glide.with(this).load(user.getPhotUrl())
+                    .crossFade()
+                    .thumbnail(0.5f)
+                    .bitmapTransform(new CircleTransform(this))
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(imgProfile);
 
         // showing dot next to notifications label
-        navigationView.getMenu().getItem(3).setActionView(R.layout.menu_dot);
+                                 navigationView.getMenu().getItem(1).setActionView(R.layout.menu_dot);
     }
 
     /***
@@ -185,19 +212,23 @@ public class ExpertMainActivity extends AppCompatActivity {
         switch (navItemIndex) {
             case 0:
                 // home
-                HomeFragment homeFragment = new HomeFragment();
-                return homeFragment;
+                ExpertHomeFragment expertHomeFragment = new ExpertHomeFragment();
+                return expertHomeFragment;
             case 1:
                 // photos
                 PhotosFragment photosFragment = new PhotosFragment();
                 return photosFragment;
+            case 2:
+                // movies fragment
+                MoviesFragment moviesFragment = new MoviesFragment();
+                return moviesFragment;
             default:
-                return new HomeFragment();
+                return new ExpertHomeFragment();
         }
     }
 
     private void setToolbarTitle() {
-        //getSupportActionBar().setTitle(activityTitles[navItemIndex]);
+        getSupportActionBar().setTitle(activityTitles[navItemIndex]);
     }
 
     private void selectNavMenu() {
@@ -222,6 +253,10 @@ public class ExpertMainActivity extends AppCompatActivity {
                     case R.id.nav_photos:
                         navItemIndex = 1;
                         CURRENT_TAG = TAG_PHOTOS;
+                        break;
+                    case R.id.nav_movies:
+                        navItemIndex = 2;
+                        CURRENT_TAG = TAG_MOVIES;
                         break;
                     default:
                         navItemIndex = 0;

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.transition.Explode;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -18,6 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.teksine.queryapplication.*;
 import com.teksine.queryapplication.model.User;
 import com.teksine.queryapplication.utils.SharedPreferencesManager;
@@ -36,6 +38,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setExitTransition(new Explode());
         setContentView(R.layout.activity_login);
         role=(RadioGroup)findViewById(R.id.radioGroup) ;
         mContext=getApplicationContext();
@@ -85,9 +88,10 @@ public class LoginActivity extends AppCompatActivity {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             Log.d("sucess:", account.getEmail());
+            FirebaseMessaging.getInstance().subscribeToTopic("news");
             User user=validateAndSaveUserInfo(account);
             msharedManger.setUserInformation(mContext,user);
-            Toast.makeText(getApplicationContext(), "successful" + account.getEmail(), Toast.LENGTH_LONG).show();
+//            Toast.makeText(getApplicationContext(), "successful" + account.getEmail(), Toast.LENGTH_LONG).show();
             int selectedID= role.getCheckedRadioButtonId();
             RadioButton role=(RadioButton)findViewById(selectedID);
             if(role.getText().equals("User")) {
@@ -96,6 +100,10 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
             }
             else if(role.getText().equals("Expert")){
+
+
+
+
                 Intent intent = new Intent(this, ExpertMainActivity.class);
                 startActivity(intent);
             }

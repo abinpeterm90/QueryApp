@@ -12,12 +12,13 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginStart="16dp"
+        android:background="@color/elementBackGround"
         app:layout_constraintLeft_toLeftOf="parent"
         android:id="@+id/constraintLayout2"
         android:layout_height="wrap_content">
 
         <android.support.constraint.ConstraintLayout
-            android:layout_width="344dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
@@ -34,10 +35,9 @@
                 android:layout_width="328dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp"
-                android:fontFamily=""
                 android:layout_marginTop="16dp"
+                android:background="@color/elementBackGround"
+                android:fontFamily=""
                 android:text="@string/app_description"
                 android:textAlignment="textStart"
                 android:textSize="16dp"
@@ -45,13 +45,13 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView2" />
+                app:layout_constraintTop_toBottomOf="@+id/userNameText" />
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/userNameText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hi ! User"
+                android:text="Hi ! "
                 android:textSize="24dp"
                 app:layout_constraintHorizontal_bias="0.05"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -61,26 +61,24 @@
     </android.support.constraint.ConstraintLayout>
 
     <android.support.constraint.ConstraintLayout
-        android:layout_width="0dp"
-        android:layout_height="100dp"
-        android:layout_marginStart="16dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintRight_toRightOf="parent"
         android:id="@+id/constraintLayout"
-        android:layout_marginTop="16dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
 
         <TextView
             android:id="@+id/expertAdviceText"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/custom_button_border"
             android:padding="10dp"
             android:text="Get Expert Advice"
-            android:textSize="20dp"
-            android:textColor="#000000"
             android:textAlignment="center"
+            android:textColor="#000000"
+            android:textSize="20dp"
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -99,18 +97,22 @@
         app:layout_constraintVertical_bias="0.0"
         app:layout_constraintHorizontal_bias="0.25"
         android:layout_marginTop="16dp"
-        android:layout_height="279dp"
+        android:layout_height="350dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp">
 
-        <TextView
-            android:text="List of previous questions will appear here"
-            android:layout_width="wrap_content"
+        <ListView
+            android:id="@+id/previousList"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/textView4"
-            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/elementBackGround"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
     </android.support.constraint.ConstraintLayout>
     </android.support.constraint.ConstraintLayout>

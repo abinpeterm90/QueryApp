@@ -15,11 +15,16 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.teksine.queryapplication.R;
 import com.teksine.queryapplication.adapters.CustomBaseAdapter;
 import com.teksine.queryapplication.model.EndUser;
+import com.teksine.queryapplication.model.User;
 import com.teksine.queryapplication.other.RowItem;
 import com.teksine.queryapplication.utils.GeneralFunctions;
 import com.teksine.queryapplication.utils.SharedPreferencesManager;
@@ -48,6 +53,9 @@ public class ExpertListFragment extends Fragment {
     List<RowItem> rowItems;
     DatabaseReference mDatabase;
     private EndUser endUser;
+    private User user;
+    long notificationCount;
+    String expertId;
     SharedPreferencesManager msharedManger=SharedPreferencesManager.getSharedPreferanceManager();
 
     public static final int[] ids =  {1,2,3,4};
@@ -101,6 +109,8 @@ public class ExpertListFragment extends Fragment {
         }
         mDatabase = FirebaseDatabase.getInstance().getReference();
         endUser=msharedManger.getEndUserInformation(getContext(),"endUser");
+        user=msharedManger.getUserInformation(getContext(),"user");
+
     }
 
     @Override
@@ -108,7 +118,6 @@ public class ExpertListFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView=inflater.inflate(R.layout.fragment_expert_list, container, false);
-
         listView = (ListView)rootView.findViewById(R.id.list);
         CustomBaseAdapter adapter = new CustomBaseAdapter(getContext(), rowItems);
         listView.setAdapter(adapter);
@@ -116,21 +125,33 @@ public class ExpertListFragment extends Fragment {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-//                Toast toast = Toast.makeText(getContext(),
-//                        "Item " + (position + 1) + ": " + rowItems.get(position).,
-//                        Toast.LENGTH_SHORT);
-//                toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
-//                toast.show();
-                nDialog = new ProgressDialog(getContext());
-                nDialog.setMessage("Updating data..");
-                nDialog.setTitle("Query");
-                nDialog.setIndeterminate(false);
-                nDialog.setCancelable(true);
-                nDialog.show();
+                 expertId= String.valueOf(rowItems.get(position).getId());
+                user.setAnswerStatus(0);
 
-                String expertId= String.valueOf(rowItems.get(position).getId());
-                mDatabase.child(expertId).child("query").child(endUser.getGoogleId()).push().setValue(endUser);
-                nDialog.hide();
+                mDatabase.child(expertId).child("notification").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot snapshot) {
+                        if (snapshot.hasChildren()) {
+                            // run some code
+                            notificationCount= snapshot.getChildrenCount();
+                            notificationCount++;
+                            Toast.makeText(getContext(),"count "+notificationCount,Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            notificationCount=1;
+                            Toast.makeText(getContext(),"no count "+notificationCount,Toast.LENGTH_SHORT).show();
+                        }
+                        mDatabase.child(expertId).child("notification").child(String.valueOf(notificationCount)).setValue(user);
+                        mDatabase.child(expertId).child("query").child(user.getGoogleId()).child(String.valueOf(notificationCount)).setValue(endUser);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
                 Fragment fragment = new successFragment();
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
