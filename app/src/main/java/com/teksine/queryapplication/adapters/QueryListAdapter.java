@@ -40,6 +40,7 @@ public class QueryListAdapter extends BaseAdapter {
         ImageView imageView;
         TextView txtName;
         TextView txtDesc;
+        TextView infoTextQuery;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -52,11 +53,13 @@ public class QueryListAdapter extends BaseAdapter {
             holder.txtDesc = (TextView) convertView.findViewById(R.id.desc);
             holder.txtName = (TextView) convertView.findViewById(R.id.title);
             holder.imageView = (ImageView) convertView.findViewById(R.id.icon);
+            holder.infoTextQuery=(TextView) convertView.findViewById(R.id.infoTextQuery);
             convertView.setTag(holder);
 
         Notification rowItem = (Notification) getItem(position);
-        holder.txtDesc.setText(rowItem.getTopic());
-        holder.txtName.setText((rowItem.getFirstName() +" "+rowItem.getLastName()).toUpperCase());
+        holder.txtDesc.setText((rowItem.getFirstName() +" "+rowItem.getLastName()).toUpperCase());
+        holder.infoTextQuery.setText("Tap to Answer/Edit");
+        holder.txtName.setText(rowItem.getTopic());
         Uri uri = parse(rowItem.getPhotoUrl());
         Picasso.with(context).load(rowItem.getPhotoUrl()).fit().into(holder.imageView);
         return convertView;

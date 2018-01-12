@@ -34,6 +34,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 9001;
     private static final String loggerTag = "Login Activity::";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -131,6 +132,9 @@ public class LoginActivity extends AppCompatActivity {
         }
         if (account.getPhotoUrl() != null) {
             user.setPhotUrl(account.getPhotoUrl().toString());
+        }
+        else{
+            user.setPhotUrl("http://www.psdgraphics.com/file/user-icon.jpg");
         }
         if (account.getId() != null) {
             user.setGoogleId(account.getId());

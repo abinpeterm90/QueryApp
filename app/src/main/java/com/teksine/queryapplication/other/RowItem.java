@@ -18,11 +18,22 @@ public class RowItem {
     private String title;
     private String desc;
 
-    public RowItem(int id,int imageId, String title, String desc) {
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+    private String topic;
+
+    public RowItem(int id,int imageId, String title, String desc,String topic) {
         this.id=id;
         this.imageId = imageId;
         this.title = title;
         this.desc = desc;
+        this.topic=topic;
     }
     public int getImageId() {
         return imageId;

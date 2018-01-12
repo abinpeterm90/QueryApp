@@ -59,13 +59,18 @@ public class ExpertListFragment extends Fragment {
     SharedPreferencesManager msharedManger=SharedPreferencesManager.getSharedPreferanceManager();
 
     public static final int[] ids =  {1,2,3,4};
-    public static final String[] titles = new String[] { "Abin Peter",
-            "Sebastian P J", "Justin John", "Anoop" };
+    public static final String[] titles = new String[] { "Sebastian P J",
+            "Justin John", "Krishna Kumar", "Anoop Kumar" };
 
     public static final String[] descriptions = new String[] {
-            "Software engineer",
-            "Hardware Engineer", "Accountant",
-            "Technecian" };
+            "",
+            "", "",
+            "" };
+
+    public static final String[] topic = new String[] {
+            "DEPUTY COLLECTOR",
+            "TAHASILDAR", "VILLAGE OFFICER",
+            "FINANCE OFFICER" };
 
     public static final Integer[] images = { R.drawable.user,
             R.drawable.user, R.drawable.user, R.drawable.user };
@@ -104,7 +109,7 @@ public class ExpertListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         rowItems = new ArrayList<RowItem>();
         for (int i = 0; i < titles.length; i++) {
-            RowItem item = new RowItem(ids[i],images[i], titles[i], descriptions[i]);
+            RowItem item = new RowItem(ids[i],images[i], titles[i], descriptions[i],topic[i]);
             rowItems.add(item);
         }
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -125,21 +130,21 @@ public class ExpertListFragment extends Fragment {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                 expertId= String.valueOf(rowItems.get(position).getId());
+                 //expertId= String.valueOf(rowItems.get(position).getId());
+                expertId="1";
                 user.setAnswerStatus(0);
-
-                mDatabase.child(expertId).child("notification").addListenerForSingleValueEvent(new ValueEventListener() {
+                mDatabase.child(expertId).child("query").child(user.getGoogleId()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot snapshot) {
                         if (snapshot.hasChildren()) {
                             // run some code
                             notificationCount= snapshot.getChildrenCount();
                             notificationCount++;
-                            Toast.makeText(getContext(),"count "+notificationCount,Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getContext(),"count "+notificationCount,Toast.LENGTH_SHORT).show();
                         }
                         else{
                             notificationCount=1;
-                            Toast.makeText(getContext(),"no count "+notificationCount,Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getContext(),"no count "+notificationCount,Toast.LENGTH_SHORT).show();
                         }
                         mDatabase.child(expertId).child("notification").child(String.valueOf(notificationCount)).setValue(user);
                         mDatabase.child(expertId).child("query").child(user.getGoogleId()).child(String.valueOf(notificationCount)).setValue(endUser);
@@ -150,10 +155,8 @@ public class ExpertListFragment extends Fragment {
 
                     }
                 });
-
-
-                Fragment fragment = new successFragment();
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                Fragment fragment = new successFragment();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.frame, fragment);
                 fragmentTransaction.addToBackStack(null);

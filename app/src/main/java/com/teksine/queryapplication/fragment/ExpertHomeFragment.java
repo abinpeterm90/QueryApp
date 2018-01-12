@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -50,7 +51,7 @@ public class ExpertHomeFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     List<Notification> rowItems;
     ProgressDialog progressDialog;
-
+    private final int PROGRESS_TIMEOUT = 3000;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -94,16 +95,17 @@ public class ExpertHomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
+        rowItems.clear();
         View rootView=inflater.inflate(R.layout.fragment_expert_home, container, false);
         adapter = new QueryListAdapter(getContext(), rowItems);
         ListView listView = (ListView)rootView.findViewById(R.id.queryList);
+        listView.setEmptyView(rootView.findViewById(R.id.empty));
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Toast.makeText(getContext(),"clicked at "+position,Toast.LENGTH_SHORT).show();
+               // Toast.makeText(getContext(),"clicked at "+position,Toast.LENGTH_SHORT).show();
                 SharedPreferencesManager.getSharedPreferanceManager().setGoogleId(getContext(),rowItems.get(position).getGoogleID());
                 SharedPreferencesManager.getSharedPreferanceManager().setQueryId(getContext(),String.valueOf(position+1));
                 Fragment fragment = new AnswerFragment();
@@ -134,7 +136,7 @@ public class ExpertHomeFragment extends Fragment {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Toast.makeText(getContext(),"child change",Toast.LENGTH_SHORT).show();
+            //    Toast.makeText(getContext(),"child change",Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -171,7 +173,13 @@ public class ExpertHomeFragment extends Fragment {
 
         // Set the progress dialog background color
         pd.getWindow().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#FFD4D9D0")));
-
+        new Handler().postDelayed(new Runnable(){
+            @Override
+            public void run() {
+                /* Create an Intent that will start the Menu-Activity. */
+                pd.dismiss();
+            }
+        }, PROGRESS_TIMEOUT);
         pd.setIndeterminate(false);
 
         // Finally, show the progress dialog

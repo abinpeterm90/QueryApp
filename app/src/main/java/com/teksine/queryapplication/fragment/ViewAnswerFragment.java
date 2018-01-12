@@ -4,24 +4,24 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.teksine.queryapplication.R;
+import com.teksine.queryapplication.model.EndUser;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link successFragment.OnFragmentInteractionListener} interface
+ * {@link ViewAnswerFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link successFragment#newInstance} factory method to
+ * Use the {@link ViewAnswerFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class successFragment extends Fragment {
+public class ViewAnswerFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -30,10 +30,11 @@ public class successFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    EndUser endUser;
 
     private OnFragmentInteractionListener mListener;
 
-    public successFragment() {
+    public ViewAnswerFragment() {
         // Required empty public constructor
     }
 
@@ -43,11 +44,11 @@ public class successFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment successFragment.
+     * @return A new instance of fragment ViewAnswerFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static successFragment newInstance(String param1, String param2) {
-        successFragment fragment = new successFragment();
+    public static ViewAnswerFragment newInstance(String param1, String param2) {
+        ViewAnswerFragment fragment = new ViewAnswerFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -58,34 +59,30 @@ public class successFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        Bundle extras = getArguments();
+      endUser = (EndUser) extras.getSerializable("item");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView=inflater.inflate(R.layout.fragment_success, container, false);
-        Button back_button=(Button) rootView.findViewById(R.id.backButton);
-        back_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                while (fragmentManager.getBackStackEntryCount() != 0) {
-                    fragmentManager.popBackStackImmediate();
-                }
+        View rootView=inflater.inflate(R.layout.fragment_view_answer, container, false);
+        TextView topicText=(TextView)rootView.findViewById(R.id.topicTextViewAnswer);
+        TextView answerText=(TextView)rootView.findViewById(R.id.query_text_view_answer);
+        if(endUser.getTopic()!=null){
+            topicText.setText(endUser.getTopic());
+        }
+        else{
+            topicText.setText("unable to find the topic! try again ");
+        }
+        if(endUser.getAnswer()!=null){
+            answerText.setText(endUser.getAnswer());
+        }
+        else{
+            answerText.setText("Not Answered yet !");
+        }
 
-                Fragment fragment = new HomeFragment();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.frame, fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-
-            }
-        });
 
         return rootView;
     }
@@ -100,12 +97,7 @@ public class successFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
+
     }
 
     @Override

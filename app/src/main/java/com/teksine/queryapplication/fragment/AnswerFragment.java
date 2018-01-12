@@ -1,9 +1,16 @@
 package com.teksine.queryapplication.fragment;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +59,8 @@ public class AnswerFragment extends Fragment {
     private TextView answer;
     private Button save;
     private EndUser endUser;
+    ProgressDialog progressDialog;
+    private final int PROGRESS_TIMEOUT = 3000;
 
 
     private OnFragmentInteractionListener mListener;
@@ -84,6 +93,7 @@ public class AnswerFragment extends Fragment {
         selectedGoogleId=SharedPreferencesManager.getSharedPreferanceManager().getGoogleId(getContext());
         questionId=SharedPreferencesManager.getSharedPreferanceManager().getQueryId(getContext());
         queryRoot = mDatabaseReferance.child("1").child("query").child(selectedGoogleId);
+         progressDialog=createProgressDialog();
     }
 
     @Override
@@ -91,6 +101,7 @@ public class AnswerFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView=inflater.inflate(R.layout.fragment_answer, container, false);
+
         questionText= (TextView) rootView.findViewById(R.id.questionText);
         save=(Button) rootView.findViewById(R.id.saveButton);
         answer=(TextView) rootView.findViewById(R.id.answerText);
@@ -124,24 +135,64 @@ public class AnswerFragment extends Fragment {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                progressDialog.show();
+                Log.d("obje",""+endUser);
                 endUser.setAnswerStatus((long) 1);
                 endUser.setAnswer(answer.getText().toString());
                 queryRoot.child(questionId).setValue(endUser);
+                progressDialog.dismiss();
+                Fragment fragment = new ExpertHomeFragment();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.frame, fragment);
+                fragmentTransaction.setCustomAnimations( R.anim.push_left_in,R.anim.push_left_out);
+                fragmentTransaction.disallowAddToBackStack();
+                fragmentTransaction.commit();
             }
         });
 
         return rootView;
     }
+    private ProgressDialog createProgressDialog() {
+        final ProgressDialog pd = new ProgressDialog(getContext());
 
+        // Set progress dialog style spinner
+        pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+
+        // Set the progress dialog title and message
+        pd.setTitle("Updating Answer");
+        pd.setMessage("Communicating with server");
+
+        // Set the progress dialog background color
+        pd.getWindow().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#FFD4D9D0")));
+        new Handler().postDelayed(new Runnable(){
+            @Override
+            public void run() {
+                /* Create an Intent that will start the Menu-Activity. */
+                pd.dismiss();
+            }
+        }, PROGRESS_TIMEOUT);
+
+        pd.setIndeterminate(false);
+
+
+        // Finally, show the progress dialog
+        return pd;
+    }
     private void updateQuestion(DataSnapshot dataSnapshot) {
+//        Toast.makeText(getContext(), "" + "updATE", Toast.LENGTH_SHORT).show();
             Iterator iterator=dataSnapshot.getChildren().iterator();
-            endUser=new EndUser();
         if(dataSnapshot.getKey().equals(questionId)) {
+            endUser=new EndUser();
 //            Toast.makeText(getContext(), "" + ((DataSnapshot) iterator.next()).getValue().toString(), Toast.LENGTH_SHORT).show();
             endUser.setAnswer(((DataSnapshot) iterator.next()).getValue().toString());
             endUser.setAnswerStatus((Long) ((DataSnapshot) iterator.next()).getValue());
+            endUser.setPhotoUrl(((DataSnapshot) iterator.next()).getValue().toString());
             endUser.setQuery(((DataSnapshot) iterator.next()).getValue().toString());
+            endUser.setTopic(((DataSnapshot) iterator.next()).getValue().toString());
             questionText.setText(endUser.getQuery());
+            answer.setText(endUser.getAnswer());
+
         }
     }
 

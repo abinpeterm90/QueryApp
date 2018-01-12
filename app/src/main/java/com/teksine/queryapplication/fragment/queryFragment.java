@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -39,6 +40,7 @@ public class queryFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     DatabaseReference mDatabase;
+    Spinner queryTopic;
     //private DatabaseReference mDatabase=FirebaseDatabase.getInstance().getReference();
     SharedPreferencesManager msharedManger=SharedPreferencesManager.getSharedPreferanceManager();
 
@@ -82,7 +84,7 @@ public class queryFragment extends Fragment {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_query, container, false);
         final EditText queryText= (EditText) view.findViewById(R.id.query_text);
-        final EditText queryTopic=(EditText)view.findViewById(R.id.topicText);
+        queryTopic=(Spinner)view.findViewById(R.id.spinner1);
         Button submitButton=(Button)view.findViewById(R.id.submit_query);
         submitButton.setOnClickListener(new View.OnClickListener() {
             User user = msharedManger.getUserInformation(getContext(),"user");
@@ -91,9 +93,12 @@ public class queryFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 EndUser endUser=new EndUser();
+                endUser.setPhotoUrl(user.getPhotUrl());
                 endUser.setQuery(queryText.getText().toString());
-                user.setTopic(queryTopic.getText().toString());
+                String topic = queryTopic.getSelectedItem().toString();
+                user.setTopic(topic);
                 endUser.setAnswer("");
+                endUser.setTopic(topic);
                 endUser.setAnswerStatus((long) 0);
                 msharedManger.setEndUserInformation(getContext(),endUser);
                 msharedManger.setUserInformation(getContext(),user);

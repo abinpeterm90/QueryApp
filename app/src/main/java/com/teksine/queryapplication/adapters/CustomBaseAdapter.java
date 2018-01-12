@@ -5,6 +5,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,6 +35,7 @@ public class CustomBaseAdapter extends BaseAdapter{
         ImageView imageView;
         TextView txtTitle;
         TextView txtDesc;
+        TextView expertName;
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -46,6 +49,7 @@ public class CustomBaseAdapter extends BaseAdapter{
             holder.txtDesc = (TextView) convertView.findViewById(R.id.desc);
             holder.txtTitle = (TextView) convertView.findViewById(R.id.title);
             holder.imageView = (ImageView) convertView.findViewById(R.id.icon);
+            holder.expertName=(TextView) convertView.findViewById(R.id.expertName);
             convertView.setTag(holder);
         }
         else {
@@ -55,8 +59,12 @@ public class CustomBaseAdapter extends BaseAdapter{
         RowItem rowItem = (RowItem) getItem(position);
 
         holder.txtDesc.setText(rowItem.getDesc());
-        holder.txtTitle.setText(rowItem.getTitle());
+        holder.txtTitle.setText(rowItem.getTopic());
+        holder.expertName.setText(rowItem.getTitle());
         holder.imageView.setImageResource(rowItem.getImageId());
+        Animation animation= AnimationUtils.loadAnimation(context, R.anim.push_left_in);
+        convertView.startAnimation(animation);
+        animation = null;
 
         return convertView;
     }
