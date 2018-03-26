@@ -30,3 +30,7 @@ public class SplashScreenActivity extends AppCompatActivity {
     }
 
 }
+
+
+
+my first commit simmyklsjrljr
